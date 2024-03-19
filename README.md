@@ -1,0 +1,127 @@
+import java.util.HashMap;
+import java.util.Scanner;
+
+class User {
+    private String userID;
+    private String userPIN;
+    private double accountBalance;
+
+    public User(String userID, String userPIN, double accountBalance) {
+        this.userID = userID;
+        this.userPIN = userPIN;
+        this.accountBalance = accountBalance;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public String getUserPIN() {
+        return userPIN;
+    }
+
+    public double getAccountBalance() {
+        return accountBalance;
+    }
+
+    public void setAccountBalance(double accountBalance) {
+        this.accountBalance = accountBalance;
+    }
+}
+
+class ATM {
+    private HashMap<String, User> users;
+    private User currentUser;
+    private Scanner scanner;
+
+    public ATM() {
+        users = new HashMap<>();
+        // Initialize some dummy users
+        users.put("123456", new User("Mr.Pranjal Maurya", "1234", 1000));
+        users.put("789012", new User("Miss Pragya", "5678", 2000));
+        users.put("1010123", new User("Mr.Ayush", "12345",10000));
+        users.put("4758392", new User("Mr.Maurya's", "12341", 12000));
+
+        scanner = new Scanner(System.in);
+    }
+
+    public void start() {
+        System.out.println("Welcome to the ATM!");
+        authenticateUser();
+        if (currentUser != null) {
+            displayMenu();
+        }
+    }
+
+    private void authenticateUser() {
+        System.out.println("Please enter your user ID:");
+        String userID = scanner.nextLine();
+        System.out.println("Please enter your PIN:");
+        String pin = scanner.nextLine();
+
+        if (users.containsKey(userID) && users.get(userID).getUserPIN().equals(pin)) {
+            currentUser = users.get(userID);
+            System.out.println("Authentication successful. Welcome, " + currentUser.getUserID() + "!");
+        } else {
+            System.out.println("Invalid credentials. Please try again.");
+            authenticateUser();
+        }
+    }
+
+    private void displayMenu() {
+        System.out.println("Select an option:");
+        System.out.println("1. Check Balance");
+        System.out.println("2. Withdraw Money");
+        System.out.println("3. Deposit Money");
+        System.out.println("4. Exit");
+        int choice = scanner.nextInt();
+        switch (choice) {
+            case 1:
+                checkBalance();
+                break;
+            case 2:
+                withdrawMoney();
+                break;
+            case 3:
+                depositMoney();
+                break;
+            case 4:
+                System.out.println("Thank you for using the ATM. Goodbye!");
+                break;
+            default:
+                System.out.println("Invalid choice. Please try again.");
+                displayMenu();
+        }
+    }
+
+    private void checkBalance() {
+        System.out.println("Your current balance is: $" + currentUser.getAccountBalance());
+        displayMenu();
+    }
+
+    private void withdrawMoney() {
+        System.out.println("Enter the amount to withdraw:");
+        double amount = scanner.nextDouble();
+        if (amount <= currentUser.getAccountBalance()) {
+            currentUser.setAccountBalance(currentUser.getAccountBalance() - amount);
+            System.out.println("Withdrawal successful. Remaining balance: $" + currentUser.getAccountBalance());
+        } else {
+            System.out.println("Insufficient funds. Please enter a lower amount.");
+        }
+        displayMenu();
+    }
+
+    private void depositMoney() {
+        System.out.println("Enter the amount to deposit:");
+        double amount = scanner.nextDouble();
+        currentUser.setAccountBalance(currentUser.getAccountBalance() + amount);
+        System.out.println("Deposit successful. New balance: $" + currentUser.getAccountBalance());
+        displayMenu();
+    }
+}
+public class Main {
+    public static void main(String[] args) {
+        ATM atm = new ATM();
+        atm.start();
+    }
+}
